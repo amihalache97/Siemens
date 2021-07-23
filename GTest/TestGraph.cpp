@@ -82,13 +82,16 @@ void TestGraph::testRemoveNode()
     ASSERT_EQUALS(pGraph->removeNode(""), RC_ParameterError);
     ASSERT_EQUALS(pGraph->removeNode("na"), RC_ValueError);
     
-    pGraph->addNode("na");
+	GNode *pNode_na = pGraph->addNode("na");
     int numNodes = pGraph->getNumNodes();
     
     ASSERT_EQUALS(pGraph->removeNode("na"), RC_OK);
     ASSERT_EQUALS(pGraph->getNumNodes(), numNodes - 1);
     
     ASSERT_EQUALS(pGraph->removeNode("na"), RC_ValueError);
+
+	delete pGraph;
+	delete pNode_na;
 }
 
 
@@ -98,6 +101,9 @@ void TestGraph::testNodeAccess()
     ASSERT_EQUALS(pGraph->getNode("na"), NULL);
     GNode *pNode = pGraph->addNode("na");
     ASSERT_EQUALS(pGraph->getNode("na"), pNode);
+
+	delete pGraph;
+	delete pNode;
 }
 
 void TestGraph::testSaveLoad()
@@ -114,26 +120,30 @@ void TestGraph::testSaveLoad()
 
 	pGraph->save("file.txt");
 
+	delete pNode_na;
+	delete pNode_nb;
+	delete pGraph;
+
 	GGraph *pGraph2 = new GGraph("");
 	pGraph2->load("file.txt");
 
 	ASSERT_EQUALS(pGraph2->getName(), "ga");
 	ASSERT_EQUALS(pGraph2->getNumNodes(), 3);
 
-	GNode* aux = pGraph2->getNode("na");
-	ASSERT_NOT_EQUALS(aux, NULL);
-	int numberConectedTo = aux->getNumConnectedTo();
+	GNode* na = pGraph2->getNode("na");
+	ASSERT_NOT_EQUALS(na, NULL);
+	int numberConectedTo = na->getNumConnectedTo();
 	ASSERT_EQUALS(numberConectedTo, 2);
-	GNode* con = aux->getNodeAtIndex(0);
-	ASSERT_NOT_EQUALS(con, NULL);
-	ASSERT_EQUALS(con->getName(), "nb");
-	con = aux->getNodeAtIndex(1);
-	ASSERT_NOT_EQUALS(con, NULL);
-	ASSERT_EQUALS(con->getName(), "nc");
-	con = aux->getNodeAtIndex(2);
+	GNode* nb = na->getNodeAtIndex(0);
+	ASSERT_NOT_EQUALS(nb, NULL);
+	ASSERT_EQUALS(nb->getName(), "nb");
+	GNode *nc = na->getNodeAtIndex(1);
+	ASSERT_NOT_EQUALS(nc, NULL);
+	ASSERT_EQUALS(nc->getName(), "nc");
+	GNode* con = na->getNodeAtIndex(2);
 	ASSERT_EQUALS(con, NULL);
 
-	aux = pGraph2->getNode("nb");
+	GNode* aux = pGraph2->getNode("nb");
 	ASSERT_NOT_EQUALS(aux, NULL);
 	numberConectedTo = aux->getNumConnectedTo();
 	ASSERT_EQUALS(numberConectedTo, 1);
@@ -149,5 +159,9 @@ void TestGraph::testSaveLoad()
 	ASSERT_EQUALS(numberConectedTo, 0);
 	con = aux->getNodeAtIndex(1);
 	ASSERT_EQUALS(con, NULL);
+
+	delete na;
+	delete nb;
+	delete pGraph2;
 
 }
