@@ -1,8 +1,10 @@
 #pragma once
 
 #include "GAPI.h"
+#include "GGraph.h"
 
 #include <string>
+#include <list>
 
 /**
  * GNode class represents a node in a given graph. Each node is 
@@ -36,6 +38,18 @@ public:
     //Get number of nodes which this node connects to
     //
     int getNumConnectedTo();
+
+	GNode* getNodeAtIndex(int index);
+
+	void deletion();
+
 private:
     std::string m_name;
+	std::list<GNode*> m_conectionsTo;
+	std::list<GNode*> m_IsConectedTo;
+	
+public:
+	static int count;
+	bool belongsToGraph;
 };
+

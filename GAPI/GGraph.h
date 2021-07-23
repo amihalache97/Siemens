@@ -3,6 +3,8 @@
 #include "GAPI.h"
 
 #include <string>
+#include <list>
+#include "GNode.h"
 
 class GNode;
 
@@ -14,6 +16,8 @@ class GAPI_API GGraph
 public:
     GGraph(const std::string &iName);
     ~GGraph(void);
+
+	const std::string& getName() { return m_name; }
 
     //
     //Create a new node object and store it in graph for future access
@@ -45,6 +49,12 @@ public:
     //Update the current state of the graph from given file
     //
     ReturnCode load(const std::string& iFileName);
+
+	void deletion();
     
 private:
+	std::string m_name;
+	std::list<GNode*> m_nodes;
+public:
+	static int count;
 };
