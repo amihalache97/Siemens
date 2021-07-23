@@ -36,6 +36,7 @@ void TestNode::testConstruct()
     ASSERT_EQUALS(pNode->getName(), "na");
     ASSERT_EQUALS(pNode->getNumConnectedTo(), 0);
     
+	delete pNode;
 }
 
 void TestNode::testConnect()

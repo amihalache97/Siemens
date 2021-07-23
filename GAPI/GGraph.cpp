@@ -27,18 +27,17 @@ GNode* GGraph::addNode(const std::string& iName)
 	{
 		node = new GNode(iName);
 
-		std::list<GNode*>::iterator findNode = std::find(m_nodes.begin(), m_nodes.end(), node);
+		for (std::list<GNode*>::iterator iterator = m_nodes.begin(); iterator != m_nodes.end(); ++iterator)
+		{
+			if ((*iterator)->getName() == iName)
+			{
+				delete(node);
+				return NULL;
+			}
+		}
 
-		if (findNode != m_nodes.end())
-		{
-			delete(node);
-			return NULL;
-		}
-		else
-		{
-			m_nodes.push_back(node);
-			node->belongsToGraph = true;
-		}
+		m_nodes.push_back(node);
+		node->belongsToGraph = true;
 	}
 
 	return node;
@@ -75,7 +74,7 @@ ReturnCode GGraph::removeNode(const std::string& iName)
 		{
 			GNode *aux = *iterator;
 			m_nodes.remove(*iterator);
-			delete aux;
+			aux->deletion();
 			return RC_OK;
 		}
 	}

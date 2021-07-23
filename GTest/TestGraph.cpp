@@ -44,6 +44,8 @@ void TestGraph::testConstruct()
     ASSERT_NOT_EQUALS(pGraph, NULL);
     ASSERT_EQUALS(pGraph->getNumNodes(), 0);
 	ASSERT_EQUALS(pGraph->getName(), "ga");
+
+	delete pGraph;
 }
 
 //
@@ -51,26 +53,24 @@ void TestGraph::testConstruct()
 //
 void TestGraph::testAddNode()
 {
-    GGraph *pGraph = new GGraph("ga");
-    ASSERT_NOT_EQUALS(pGraph, NULL);
-    int numNodes = pGraph->getNumNodes();
-    
-    ASSERT_EQUALS(pGraph->addNode(""), NULL);
+	GGraph *pGraph = new GGraph("ga");
+	ASSERT_NOT_EQUALS(pGraph, NULL);
+	int numNodes = pGraph->getNumNodes();
 
-    GNode *pNode_na = pGraph->addNode("na");
-    ASSERT_NOT_EQUALS(pNode_na, NULL);
-    ASSERT_EQUALS(pGraph->getNumNodes(), numNodes + 1);
+	ASSERT_EQUALS(pGraph->addNode(""), NULL);
 
-	delete pNode_na;
-    pNode_na = NULL;
+	GNode *pNode_na = pGraph->addNode("na");
+	ASSERT_NOT_EQUALS(pNode_na, NULL);
+	ASSERT_EQUALS(pGraph->getNumNodes(), numNodes + 1);
+	pNode_na = NULL;
 
-    pNode_na = pGraph->addNode("na");
-    ASSERT_EQUALS(pNode_na, NULL);
-    ASSERT_EQUALS(pGraph->getNumNodes(), numNodes + 1);
-    pGraph = NULL;
+	pNode_na = pGraph->addNode("na");
+	ASSERT_EQUALS(pNode_na, NULL);
+	ASSERT_EQUALS(pGraph->getNumNodes(), numNodes + 1);
+	pGraph = NULL;
 
-	delete pNode_na;
 	delete pGraph;
+	delete pNode_na;
 }
 
 //
