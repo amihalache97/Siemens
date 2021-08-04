@@ -2,6 +2,7 @@
 #include "../GAPI/GGraph.h"
 #include "../GAPI/GNode.h"
 
+
 TestGraph::TestGraph(void)
 {
 }
@@ -44,8 +45,6 @@ void TestGraph::testConstruct()
     ASSERT_NOT_EQUALS(pGraph, NULL);
     ASSERT_EQUALS(pGraph->getNumNodes(), 0);
 	ASSERT_EQUALS(pGraph->getName(), "ga");
-
-	delete pGraph;
 }
 
 //
@@ -53,24 +52,23 @@ void TestGraph::testConstruct()
 //
 void TestGraph::testAddNode()
 {
-	GGraph *pGraph = new GGraph("ga");
-	ASSERT_NOT_EQUALS(pGraph, NULL);
-	int numNodes = pGraph->getNumNodes();
+    GGraph *pGraph = new GGraph("ga");
+    ASSERT_NOT_EQUALS(pGraph, NULL);
+    int numNodes = pGraph->getNumNodes();
+    
+    ASSERT_EQUALS(pGraph->addNode(""), NULL);
 
-	ASSERT_EQUALS(pGraph->addNode(""), NULL);
+	std::shared_ptr<GNode> pNode_na = pGraph->addNode("na");
+    ASSERT_NOT_EQUALS(pNode_na, NULL);
+    ASSERT_EQUALS(pGraph->getNumNodes(), numNodes + 1);
 
-	GNode *pNode_na = pGraph->addNode("na");
-	ASSERT_NOT_EQUALS(pNode_na, NULL);
-	ASSERT_EQUALS(pGraph->getNumNodes(), numNodes + 1);
-	pNode_na = NULL;
+    pNode_na = NULL;
 
-	pNode_na = pGraph->addNode("na");
-	ASSERT_EQUALS(pNode_na, NULL);
-	ASSERT_EQUALS(pGraph->getNumNodes(), numNodes + 1);
-	pGraph = NULL;
+    pNode_na = pGraph->addNode("na");
+    ASSERT_EQUALS(pNode_na, NULL);
+    ASSERT_EQUALS(pGraph->getNumNodes(), numNodes + 1);
+    pGraph = NULL;
 
-	delete pGraph;
-	delete pNode_na;
 }
 
 //
@@ -82,16 +80,13 @@ void TestGraph::testRemoveNode()
     ASSERT_EQUALS(pGraph->removeNode(""), RC_ParameterError);
     ASSERT_EQUALS(pGraph->removeNode("na"), RC_ValueError);
     
-	GNode *pNode_na = pGraph->addNode("na");
+    pGraph->addNode("na");
     int numNodes = pGraph->getNumNodes();
     
     ASSERT_EQUALS(pGraph->removeNode("na"), RC_OK);
     ASSERT_EQUALS(pGraph->getNumNodes(), numNodes - 1);
     
     ASSERT_EQUALS(pGraph->removeNode("na"), RC_ValueError);
-
-	delete pGraph;
-	delete pNode_na;
 }
 
 
@@ -99,20 +94,17 @@ void TestGraph::testNodeAccess()
 {
     GGraph *pGraph = new GGraph("ga");
     ASSERT_EQUALS(pGraph->getNode("na"), NULL);
-    GNode *pNode = pGraph->addNode("na");
+	std::shared_ptr<GNode> pNode = pGraph->addNode("na");
     ASSERT_EQUALS(pGraph->getNode("na"), pNode);
-
-	delete pGraph;
-	delete pNode;
 }
 
 void TestGraph::testSaveLoad()
 {
 	GGraph *pGraph = new GGraph("ga");
 
-	GNode *pNode_na = pGraph->addNode("na");
-	GNode *pNode_nb = pGraph->addNode("nb");
-	GNode *pNode_nc = pGraph->addNode("nc");
+	auto pNode_na = pGraph->addNode("na");
+	auto pNode_nb = pGraph->addNode("nb");
+	auto pNode_nc = pGraph->addNode("nc");
 
 	pNode_na->connect(pNode_nb);
 	pNode_na->connect(pNode_nc);
@@ -120,48 +112,39 @@ void TestGraph::testSaveLoad()
 
 	pGraph->save("file.txt");
 
-	delete pNode_na;
-	delete pNode_nb;
-	delete pGraph;
-
 	GGraph *pGraph2 = new GGraph("");
 	pGraph2->load("file.txt");
 
 	ASSERT_EQUALS(pGraph2->getName(), "ga");
 	ASSERT_EQUALS(pGraph2->getNumNodes(), 3);
 
-	GNode* na = pGraph2->getNode("na");
-	ASSERT_NOT_EQUALS(na, NULL);
-	int numberConectedTo = na->getNumConnectedTo();
+	std::shared_ptr<GNode> intermediarNode = pGraph2->getNode("na");
+	ASSERT_NOT_EQUALS(intermediarNode, NULL);
+	int numberConectedTo = intermediarNode->getNumConnectedTo();
 	ASSERT_EQUALS(numberConectedTo, 2);
-	GNode* nb = na->getNodeAtIndex(0);
-	ASSERT_NOT_EQUALS(nb, NULL);
-	ASSERT_EQUALS(nb->getName(), "nb");
-	GNode *nc = na->getNodeAtIndex(1);
-	ASSERT_NOT_EQUALS(nc, NULL);
-	ASSERT_EQUALS(nc->getName(), "nc");
-	GNode* con = na->getNodeAtIndex(2);
-	ASSERT_EQUALS(con, NULL);
+	std::shared_ptr<GNode> conectionNode = intermediarNode->getNodeAtIndex(0);
+	ASSERT_NOT_EQUALS(conectionNode, NULL);
+	ASSERT_EQUALS(conectionNode->getName(), "nb");
+	conectionNode = intermediarNode->getNodeAtIndex(1);
+	ASSERT_NOT_EQUALS(conectionNode, NULL);
+	ASSERT_EQUALS(conectionNode->getName(), "nc");
+	conectionNode = intermediarNode->getNodeAtIndex(2);
+	ASSERT_EQUALS(conectionNode, NULL);
 
-	GNode* aux = pGraph2->getNode("nb");
-	ASSERT_NOT_EQUALS(aux, NULL);
-	numberConectedTo = aux->getNumConnectedTo();
+	intermediarNode = pGraph2->getNode("nb");
+	ASSERT_NOT_EQUALS(intermediarNode, NULL);
+	numberConectedTo = intermediarNode->getNumConnectedTo();
 	ASSERT_EQUALS(numberConectedTo, 1);
-	con = aux->getNodeAtIndex(0);
-	ASSERT_NOT_EQUALS(con, NULL);
-	ASSERT_EQUALS(con->getName(), "nc");
-	con = aux->getNodeAtIndex(1);
-	ASSERT_EQUALS(con, NULL);
+	conectionNode = intermediarNode->getNodeAtIndex(0);
+	ASSERT_NOT_EQUALS(conectionNode, NULL);
+	ASSERT_EQUALS(conectionNode->getName(), "nc");
+	conectionNode = intermediarNode->getNodeAtIndex(1);
+	ASSERT_EQUALS(conectionNode, NULL);
 
-	aux = pGraph2->getNode("nc");
-	ASSERT_NOT_EQUALS(aux, NULL);
-	numberConectedTo = aux->getNumConnectedTo();
+	intermediarNode = pGraph2->getNode("nc");
+	ASSERT_NOT_EQUALS(intermediarNode, NULL);
+	numberConectedTo = intermediarNode->getNumConnectedTo();
 	ASSERT_EQUALS(numberConectedTo, 0);
-	con = aux->getNodeAtIndex(1);
-	ASSERT_EQUALS(con, NULL);
-
-	delete na;
-	delete nb;
-	delete pGraph2;
-
+	conectionNode = intermediarNode->getNodeAtIndex(1);
+	ASSERT_EQUALS(conectionNode, NULL);
 }

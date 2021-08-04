@@ -21,6 +21,9 @@
     <ClCompile Include="GNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+	<ClCompile Include="ObjectCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GAPI.h">
@@ -30,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+	<ClInclude Include="ObjectCounter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

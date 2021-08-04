@@ -31,35 +31,31 @@ void TestNode::tearDown(const std::string& iTestName)
 
 void TestNode::testConstruct()
 {
-    GNode *pNode = new GNode("na");
+	std::shared_ptr<GNode> pNode(new GNode("na"));
     ASSERT_NOT_EQUALS(pNode, NULL);
     ASSERT_EQUALS(pNode->getName(), "na");
     ASSERT_EQUALS(pNode->getNumConnectedTo(), 0);
-    
-	delete pNode;
 }
 
 void TestNode::testConnect()
 {
-    GNode *pNode = new GNode("node");
+	std::shared_ptr<GNode> pNode(new GNode("node"));
     ASSERT_EQUALS(pNode->connect(NULL), RC_ParameterError);
     
-    GNode *pNa = new GNode("na");
-    ASSERT_EQUALS(pNode->connect(pNa), RC_OK);
+    std::shared_ptr<GNode> pNa(new GNode("na"));
+	ASSERT_EQUALS(pNode->connect(pNa), RC_OK);
     ASSERT_EQUALS(pNode->getNumConnectedTo(), 1);
     ASSERT_EQUALS(pNode->connect(pNa), RC_ValueError);
     ASSERT_EQUALS(pNode->getNumConnectedTo(), 1);
 
-	delete pNode;
-	delete pNa;
 }
 
 void TestNode::testDisconnect()
 {
-    GNode *pNode = new GNode("node");
+	std::shared_ptr<GNode> pNode(new GNode("node"));
     ASSERT_EQUALS(pNode->disconnect(NULL), RC_ParameterError);
     
-    GNode *pNa = new GNode("na");
+	std::shared_ptr<GNode> pNa(new GNode("na"));
     pNode->connect(pNa);
     
 	ASSERT_EQUALS(pNode->getNumConnectedTo(), 1);
@@ -67,15 +63,14 @@ void TestNode::testDisconnect()
     ASSERT_EQUALS(pNode->getNumConnectedTo(), 0);
     ASSERT_EQUALS(pNode->disconnect(pNa), RC_ValueError);
 
-	delete pNode;
-	delete pNa;
 }
 
 void TestNode::testDisconnectAll()
 {
-    GNode *pNode = new GNode("node");
-    GNode *pNa = new GNode("na");
-    GNode *pNb = new GNode("nb");
+	std::shared_ptr<GNode> pNode(new GNode("node"));
+    std::shared_ptr<GNode> pNa(new GNode("na"));
+    std::shared_ptr<GNode> pNb(new GNode("nb"));
+    
     pNode->connect(pNa);
     pNode->connect(pNb);
     
@@ -85,8 +80,5 @@ void TestNode::testDisconnectAll()
     ASSERT_EQUALS(pNode->disconnect(pNa), RC_ValueError);
     ASSERT_EQUALS(pNode->disconnect(pNb), RC_ValueError);
 
-	delete pNode;
-	delete pNa;
-	delete pNb;
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "TestCase.h"
 
-class GObjectTracker;
+//class ObjectCounter;
 
 /**
  * Test Case to check that life cycle of objects are managed correctly. Below the word 

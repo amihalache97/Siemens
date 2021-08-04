@@ -87,11 +87,13 @@
   <ItemGroup>
     <ClCompile Include="GGraph.cpp" />
     <ClCompile Include="GNode.cpp" />
+	<ClCompile Include="ObjectCounter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GAPI.h" />
     <ClInclude Include="GGraph.h" />
     <ClInclude Include="GNode.h" />
+	<ClInclude Include="ObjectCounter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,60 +1,55 @@
 #include "GGraph.h"
 #include <fstream>;
 
-int GGraph::count = 0;
-
 GGraph::GGraph(const std::string &iName)
 {
 	m_name = iName;
-	GGraph::count++;
+	ObjectCounter::numberOfObjects++;
 }
 
 GGraph::~GGraph(void)
 {
-	GGraph::count--;
+	ObjectCounter::numberOfObjects--;
 }
 
 
-GNode* GGraph::addNode(const std::string& iName)
+std::shared_ptr<GNode> GGraph::addNode(const std::string& iName)
 {
-	GNode *node = NULL;
-
 	if (iName.empty())
 	{
 		return NULL;
 	}
 	else
 	{
-		node = new GNode(iName);
 
-		for (std::list<GNode*>::iterator iterator = m_nodes.begin(); iterator != m_nodes.end(); ++iterator)
+		for (auto iterator : m_nodes)
 		{
-			if ((*iterator)->getName() == iName)
+			if (iterator->getName() == iName)
 			{
-				delete(node);
 				return NULL;
 			}
 		}
 
-		m_nodes.push_back(node);
-		node->belongsToGraph = true;
-	}
+		auto node = std::make_shared<GNode>(iName);
 
-	return node;
+		m_nodes.push_back(node);
+
+		return node;
+	}
 }
 
-GNode* GGraph::getNode(const std::string& iName)
+std::shared_ptr<GNode> GGraph::getNode(const std::string& iName)
 {
 	if (iName.empty())
 	{
 		return NULL;
 	}
 
-	for (std::list<GNode*>::iterator iterator = m_nodes.begin(); iterator != m_nodes.end(); ++iterator)
+	for (auto iterator : m_nodes)
 	{
-		if ((*iterator)->getName() == iName)
+		if (iterator->getName() == iName)
 		{
-			return *iterator;
+			return iterator;
 		}
 	}
 
@@ -68,13 +63,11 @@ ReturnCode GGraph::removeNode(const std::string& iName)
 		return RC_ParameterError;
 	}
 
-	for (std::list<GNode*>::iterator iterator = m_nodes.begin(); iterator != m_nodes.end(); ++iterator)
+	for (int i=0; i< m_nodes.size(); i++)
 	{
-		if ((*iterator)->getName() == iName)
+		if (m_nodes[i]->getName() == iName)
 		{
-			GNode *aux = *iterator;
-			m_nodes.remove(*iterator);
-			aux->deletion();
+			m_nodes.erase(m_nodes.begin() + i);
 			return RC_OK;
 		}
 	}
@@ -90,15 +83,15 @@ ReturnCode GGraph::save(const std::string& iFileName)
 	{
 		file << m_name << std::endl;
 
-		for (std::list<GNode*>::iterator iteratorNode = m_nodes.begin(); iteratorNode != m_nodes.end(); ++iteratorNode)
+		for (auto iteratorNode : m_nodes)
 		{
-			file << (*iteratorNode)->getName();
+			file << iteratorNode->getName();
 
-			int numberOfConnections = (*iteratorNode)->getNumConnectedTo();
+			int numberOfConnections = iteratorNode->getNumConnectedTo();
 
 			for (int i = 0; i < numberOfConnections; i++)
 			{
-				GNode* conection = (*iteratorNode)->getNodeAtIndex(i);
+				std::shared_ptr<GNode> conection = iteratorNode->getNodeAtIndex(i);
 
 				if (conection != NULL)
 				{
@@ -133,13 +126,13 @@ ReturnCode GGraph::load(const std::string& iFileName)
 		{
 			std::string conectionName;
 
-			GNode* node = addNode(nodeName);
+			auto node = addNode(nodeName);
 
 			while ((file.peek() != '\n') && (file.peek() != EOF))
 			{
 				file >> conectionName;
-				GNode* connectionNode = new GNode(conectionName);
-				node->connect(connectionNode);
+				
+				node->connect(std::make_shared<GNode>(conectionName));
 			}
 		}
 	}
@@ -154,21 +147,4 @@ ReturnCode GGraph::load(const std::string& iFileName)
 int GGraph::getNumNodes()
 {
     return m_nodes.size();
-}
-
-
-void GGraph::deletion()
-{
-	if (m_nodes.size() == 0)
-	{
-		delete this;
-	}
-	else
-	{
-		for (std::list<GNode*>::iterator iterator = m_nodes.begin(); iterator != m_nodes.end(); ++iterator)
-		{
-			(*iterator)->deletion();
-		}
-		delete this;
-	}
 }

@@ -2,9 +2,11 @@
 
 #include "GAPI.h"
 #include "GGraph.h"
+#include "ObjectCounter.h"
 
 #include <string>
-#include <list>
+#include <vector>
+#include <algorithm>
 
 /**
  * GNode class represents a node in a given graph. Each node is 
@@ -21,13 +23,13 @@ public:
     //
     //Connect this node to given ipNode
     //
-    ReturnCode connect(GNode *ipNode);
+    ReturnCode connect(std::shared_ptr<GNode> ipNode);
     
     //
     //Break the connection between this node and given ip node
     //if exists.
     //
-    ReturnCode disconnect(GNode *ipNode);
+    ReturnCode disconnect(std::shared_ptr<GNode> ipNode);
     
     //
     //Disconnect all connections of this node.
@@ -39,17 +41,10 @@ public:
     //
     int getNumConnectedTo();
 
-	GNode* getNodeAtIndex(int index);
-
-	void deletion();
+	std::shared_ptr<GNode> getNodeAtIndex(int index);
 
 private:
     std::string m_name;
-	std::list<GNode*> m_conectionsTo;
-	std::list<GNode*> m_IsConectedTo;
-	
-public:
-	static int count;
-	bool belongsToGraph;
+	std::vector<std::shared_ptr<GNode>> m_conectionsTo;
 };
 

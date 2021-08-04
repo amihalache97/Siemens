@@ -1,65 +1,54 @@
 #include "GNode.h"
 
-int GNode::count = 0;
-
 GNode::GNode(const std::string &iName)
 {
 	m_name = iName;
-	belongsToGraph = false;
-	GNode::count++;
+	ObjectCounter::numberOfObjects++;
 }
 
-GNode::~GNode(void)
+GNode::~GNode()
 {
-	for (std::list<GNode*>::iterator it = m_conectionsTo.begin(); it != m_conectionsTo.end(); ++it)
-	{
-		(*it)->deletion();
-	}
-	GNode::count--;
+	ObjectCounter::numberOfObjects--;
 }
 
-ReturnCode GNode::connect(GNode *ipNode)
+ReturnCode GNode::connect(std::shared_ptr<GNode> ipNode)
 {
 	if (ipNode == NULL)
 	{
 		return RC_ParameterError;
 	}
 
-	std::list<GNode*>::iterator findNodeConnection = std::find(m_conectionsTo.begin(), m_conectionsTo.end(), ipNode);
+	for (int i = 0; i < m_conectionsTo.size(); i++)
+	{
+		if (m_conectionsTo[i]->m_name == ipNode->m_name)
+		{
+			return RC_ValueError;
+		}
+	}
 	
-	if (findNodeConnection == m_conectionsTo.end())
-	{
-		m_conectionsTo.push_back(ipNode);
-		ipNode->m_IsConectedTo.push_back(this);
-	}
-	else
-	{
-		return RC_ValueError;
-	}
-
+	m_conectionsTo.push_back(std::shared_ptr<GNode>(ipNode));
+	
 	return RC_OK;
 }
 
-ReturnCode GNode::disconnect(GNode *ipNode)
+ReturnCode GNode::disconnect(std::shared_ptr<GNode> ipNode)
 {
 	if (ipNode == NULL)
 	{
 		return RC_ParameterError;
 	}
 
-	std::list<GNode*>::iterator findNodeConnection = std::find(m_conectionsTo.begin(), m_conectionsTo.end(), ipNode);
-
-	if (findNodeConnection != m_conectionsTo.end())
-	{	
-		m_conectionsTo.remove(ipNode);
-		ipNode->deletion();
-	}
-	else
+	for (int i = 0; i < m_conectionsTo.size(); i++)
 	{
-		return RC_ValueError;
+		if (m_conectionsTo[i]->m_name == ipNode->m_name)
+		{
+			m_conectionsTo[i].reset();
+			m_conectionsTo.erase(m_conectionsTo.begin() + i);
+			return RC_OK;
+		}
 	}
 
-    return RC_OK;
+    return RC_ValueError;
 }
 
 ReturnCode GNode::disconnectAll()
@@ -74,39 +63,12 @@ int GNode::getNumConnectedTo()
     return m_conectionsTo.size();
 }
 
-GNode * GNode::getNodeAtIndex(int index)
+std::shared_ptr<GNode> GNode::getNodeAtIndex(int index)
 {
-	if (index > m_conectionsTo.size() - 1)
+	if (index > m_conectionsTo.size() - 1 || m_conectionsTo.size() == 0)
 	{
 		return NULL;
 	}
 
-	std::list<GNode*>::iterator it = m_conectionsTo.begin();
-
-	for (int i = 0; i < index;i++)
-	{
-		if (it != m_conectionsTo.end())
-		{
-			++it;
-		}
-		else
-		{
-			return NULL;
-		}
-	}
-
-	return *it;
-}
-
-void GNode::deletion()
-{
-	if (m_IsConectedTo.size() == 0 && belongsToGraph == false)
-	{
-		delete this;
-	}
-	else
-	{
-		belongsToGraph = false;
-		m_IsConectedTo.clear();
-	}
+	return m_conectionsTo[index];
 }

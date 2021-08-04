@@ -3,8 +3,9 @@
 #include "GAPI.h"
 
 #include <string>
-#include <list>
+#include <vector>
 #include "GNode.h"
+#include "ObjectCounter.h"
 
 class GNode;
 
@@ -23,7 +24,7 @@ public:
     //Create a new node object and store it in graph for future access
     //Created object is returned to the caller as well
     //
-    GNode *addNode(const std::string &iName);
+	std::shared_ptr<GNode> addNode(const std::string &iName);
 
     //
     //Remove the node given by its name.
@@ -33,7 +34,7 @@ public:
     //
     //Return the node object identified by iName
     //
-    GNode* getNode(const std::string& iName);
+	std::shared_ptr<GNode> getNode(const std::string& iName);
     
     //
     //Return number of nodes attached to this graph
@@ -50,11 +51,7 @@ public:
     //
     ReturnCode load(const std::string& iFileName);
 
-	void deletion();
-    
 private:
 	std::string m_name;
-	std::list<GNode*> m_nodes;
-public:
-	static int count;
+	std::vector<std::shared_ptr<GNode>> m_nodes;
 };
